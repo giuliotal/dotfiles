@@ -1,0 +1,11 @@
+profile {
+	output "Philips Consumer Electronics Company PHL 273V7 UK02115006677" mode 1920x1080 position 0,0
+	output eDP-1 disable
+}
+profile {
+	output "Lenovo Group Limited L24i-10 U3P0MZ7Z" mode 1920x1080 position 0,0
+	output eDP-1 disable
+}
+profile {
+	output eDP-1 enable
+}

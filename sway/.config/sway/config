@@ -1,0 +1,221 @@
+# Default config for sway
+#
+# Riccardo Palombo - https://riccardo.im
+# Preparato per la community Patreon: patreon.com/riccardopalombo
+#
+
+include /etc/sway/config.d/*
+
+# xwayland disable
+
+# OUTPUT CONFIGURATION
+
+exec_always kanshi
+exec_always nohup easyeffects --gapplication-service
+
+#workspace 1 output DP-2
+workspace 1 output HDMI-A-2
+#workspace 2 output DP-2
+workspace 2 output HDMI-A-2
+#workspace 3 output DP-2
+workspace 3 output HDMI-A-2
+workspace 4 output DP-2
+workspace 5 output eDP-1
+workspace 6 output eDP-1
+workspace 7 output eDP-1
+workspace 8 output eDP-1
+
+# Software
+set {
+    $mod Mod4
+    $term foot
+    $menu rofi
+    $fm nemo
+}
+
+
+# Stile e grafica
+font pango:JetBrains Mono 11
+default_border pixel 2 
+default_floating_border pixel 2
+smart_borders on
+smart_gaps on
+hide_edge_borders none
+focus_follows_mouse yes
+gaps inner 10px
+gaps outer 0px
+output * bg ~/Pictures/bg.png tile
+floating_modifier $mod normal
+
+
+# class                 border  bground text    indicator child_border
+client.focused          #BD93F9 #6272A4 #F8F8F2 #BD93F9   #BD93F9
+client.focused_inactive #44475A #44475A #F8F8F2 #262626   #262626
+client.unfocused        #282A36 #282A36 #BFBFBF #262626   #262626
+client.background       #262626
+
+
+# Input
+input type:keyboard {
+    xkb_layout it
+}
+
+input "1267:32:Elan_Touchpad" {
+	dwt enabled
+	tap enabled
+	natural_scroll enabled
+	middle_emulation enabled
+	accel_profile adaptive
+	pointer_accel 0.2
+}
+
+# Tasti multimediali
+
+set $WOBSOCK $XDG_RUNTIME_DIR/wob.sock
+exec rm -f $WOBSOCK && mkfifo $WOBSOCK && tail -f $WOBSOCK | wob
+exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
+
+bindsym {
+	XF86AudioRaiseVolume exec pamixer -ui 2 && pamixer --get-volume > $WOBSOCK 
+	XF86AudioLowerVolume exec pamixer -ud 2 && pamixer --get-volume > $WOBSOCK
+	XF86AudioMute exec pamixer --toggle-mute && ( pamixer --get-mute && echo 0 > $WOBSOCK )
+	XF86MonBrightnessDown exec brightnessctl set 5%- | sed -En 's/.*\(([0-9]+)%\).*/\1/p' > $WOBSOCK
+	XF86MonBrightnessUp exec brightnessctl set +5% | sed -En 's/.*\(([0-9]+)%\).*/\1/p' > $WOBSOCK
+	XF86AudioMicMute exec pamixer --default-source -t
+}
+
+# Scorciatoie essenziali
+bindsym {    
+    $mod+Return exec $term    
+    $mod+e exec $fm 
+    $mod+d exec $menu -modi run -monitor -1 -show run -drun-display-format {name} -theme dark
+    # Info stats e power-menu
+    $mod+z exec ~/dotfiles/scripts/noti.sh
+    $mod+Shift+q exec ~/dotfiles/scripts/rofi-power.sh
+    # Screenshot
+    Print exec grim -g "$(slurp -d)" - | wl-copy 
+    Shift+Print exec grim -g "$(slurp -d)"
+    
+    $mod+q kill
+    $mod+Shift+c reload
+
+    # Audio
+    $mod+Shift+a exec pavucontrol
+
+    # Lock
+    $mod+alt+l exec swaylock -f -i ~/Pictures/lock.png  
+}
+
+# Gestione finestre
+
+bindsym {
+    # Focus
+    $mod+h focus left
+    $mod+k focus down
+    $mod+j focus up
+    $mod+l focus right
+    $mod+Left focus left
+    $mod+Down focus down
+    $mod+Up focus up
+    $mod+Right focus right
+    $mod+a focus parent
+    # Muovere finestre
+    $mod+Shift+h move left
+    $mod+Shift+k move down
+    $mod+Shift+j move up
+    $mod+Shift+l move right
+    $mod+Shift+Left move left
+    $mod+Shift+Down move down
+    $mod+Shift+Up move up
+    $mod+Shift+Right move right
+    # Cambiare workspace
+    $mod+1 workspace number 1
+    $mod+2 workspace number 2
+    $mod+3 workspace number 3
+    $mod+4 workspace number 4
+    $mod+5 workspace number 5
+    $mod+6 workspace number 6
+    $mod+7 workspace number 7
+    $mod+8 workspace number 8
+    $mod+9 workspace number 9
+    $mod+0 workspace number 10
+    # Spostare finestre su workspace
+    $mod+Shift+1 move container to workspace number 1
+    $mod+Shift+2 move container to workspace number 2
+    $mod+Shift+3 move container to workspace number 3
+    $mod+Shift+4 move container to workspace number 4
+    $mod+Shift+5 move container to workspace number 5
+    $mod+Shift+6 move container to workspace number 6
+    $mod+Shift+7 move container to workspace number 7
+    $mod+Shift+8 move container to workspace number 8
+    $mod+Shift+9 move container to workspace number 9
+    $mod+Shift+0 move container to workspace number 10
+}
+
+# Gestione layout
+
+bindsym {
+    $mod+b splith
+    $mod+v splitv
+    $mod+w layout toggle split
+    $mod+s layout stacking
+    $mod+t layout tabbed
+    $mod+f fullscreen
+    $mod+Tab focus mode_toggle
+    # Rende la finestra floating, piccola e centrata
+    $mod+Shift+space floating toggle, resize set width 1200 px height 600px
+    # Rende la finestra floating, grande e allineata
+    $mod+Shift+Control+space floating toggle, resize set width 1783 px height 946px, move position 53 70
+}
+
+
+# Dimensione finestre
+
+mode "resize" {
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# Qualche regola sulle finestre
+for_window {
+	[app_id="blueman-manager"] floating enable, resize set width 900 px height 400 px
+	[app_id="pavucontrol"] floating enable, resize set width 900 px height 500 px
+	[app_id="nwg-displays"] floating enable, resize set width 900 px height 800 px
+	[app_id="termfloat"] floating enable, resize set width 1200 px height 600 px
+	[app_id="telegram-desktop"] floating enable, resize set width 400 px height 500 px
+	[app_id="file-roller"] floating enable, resize set width 400 px height 200 px
+	[app_id="Calculator"] floating enable, resize set width 200 px height 500 px
+	[title="(?:Open|Save) (?:File|Folder|As)"] floating enable; sticky enable
+	[app_id="firefox"] inhibit_idle focus
+	[window_role="pop-up"] floating enable
+	[window_role="bubble"] floating enable
+	[window_role="dialog"] floating enable
+	[window_type="dialog"] floating enable
+}
+
+# Avvio programmi
+exec swayidle -w \
+         timeout 900 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+         before-sleep 'swaylock -f -i ~/Pictures/lock.png'
+
+exec_always {
+    ~/dotfiles/scripts/fix_screensharing.sh
+    gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'
+    gsettings set org.gnome.desktop.interface icon-theme 'Dracula'
+    gsettings set org.gnome.desktop.interface font-name 'JetBrains Mono'
+    
+    # Necessario per wob (vedi tasti multimediali)
+    rm -f $SWAYSOCK.wob && mkfifo $SWAYSOCK.wob && tail -f $SWAYSOCK.wob | wob --background-color='#262626ff'	
+}
+
+exec {
+	/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+	~/dotfiles/scripts/noti.sh
+    # Per notificare la batteria bassa
+        # batsignal -n BAT0 -f 95 -m 180 -b -e
+}
